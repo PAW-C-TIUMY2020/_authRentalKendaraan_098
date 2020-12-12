@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace RentalKendaraan_098
 {
@@ -38,13 +39,31 @@ namespace RentalKendaraan_098
             services.AddDbContext<RentalKendaraanContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-          //  services.AddDefaultIdentity<IdentityUser>()
-            //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            //  services.AddDefaultIdentity<IdentityUser>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultUI()
-.AddEntityFrameworkStores<RentalKendaraanContext>().AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<RentalKendaraanContext>().AddDefaultTokenProviders();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("readonlypolicy",
+                    builder => builder.RequireRole("Admin", "Manager", "Kasir"));
+                options.AddPolicy("writepolicy",
+                    builder => builder.RequireRole("Admin", "Kasir"));
+                options.AddPolicy("editpolicy",
+                    builder => builder.RequireRole("Admin", "Kasir"));
+                options.AddPolicy("deletepolicy",
+                    builder => builder.RequireRole("Admin", "Kasir"));
+            });
+
+
+            services.AddScoped<Peminjaman>();
+            services.AddScoped<Pengembalian>();
+          //  services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultUI()
+           //     .AddEntityFrameworkStores<RentalKendaraanContext>().AddDefaultTokenProviders();
 
         }
 
